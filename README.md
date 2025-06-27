@@ -164,6 +164,6 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ## Contacto
 
-Tu Nombre - [@tutwitter](https://twitter.com/tutwitter) - email@example.com
+Juan Gabriel Services - [@juanco1987](https://github.com/juanco1987)
 
-Link del Proyecto: [https://github.com/tu-usuario/app-relacion-servicios](https://github.com/tu-usuario/app-relacion-servicios) 
+Link del Proyecto: [https://github.com/juanco1987/app-relacion-servicios](https://github.com/juanco1987/app-relacion-servicios) 
