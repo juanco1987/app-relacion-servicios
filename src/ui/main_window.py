@@ -374,6 +374,8 @@ class ModernInformesApp:
             self.df_resultado,
             self.nombre_pdf.get(),
             self.notas.get(),
+            self.fecha_inicio.get(),
+            self.fecha_fin.get(),
             self._log_message
         )
         self.ruta_pdf = settings.get_pdf_output_path(self.nombre_pdf.get())

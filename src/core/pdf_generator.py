@@ -30,7 +30,7 @@ class PDF(FPDF):
         self.set_font("Helvetica", '', 8)
         self.set_text_color(0, 0, 0)
 
-    def tabla_servicios(self, df, notas=None):
+    def tabla_servicios(self, df, notas=None, fecha_inicio_analisis=None, fecha_fin_analisis=None):
         # Ajuste de anchos de columna
         ancho_fecha = 22
         ancho_direccion = 50
@@ -321,15 +321,19 @@ class PDF(FPDF):
         self.ln(5)
         self.set_font("Helvetica", '', 10)
         self.cell(0, 6, f"Total de servicios registrados: {len(df)}", 0, 1)
-        if not df.empty and 'FECHA' in df.columns and not df['FECHA'].empty: # Reemplazar pd.notnull(df['FECHA']).any() con una verificación más robusta
-            # Usar fecha_larga si está definida, de lo contrario usar strftime
+        if fecha_inicio_analisis and fecha_fin_analisis:
+            self.cell(
+                0, 6,
+                f"Período analizado: {fecha_larga(fecha_inicio_analisis)} a {fecha_larga(fecha_fin_analisis)}",
+                0, 1
+            )
+        elif not df.empty and 'FECHA' in df.columns and not df['FECHA'].empty:
             try:
-                # Verificar si fecha_larga existe en el scope (debe estar importada o definida)
-                fecha_inicio_str = fecha_larga(df['FECHA'].min()) if 'fecha_larga' in globals() else df['FECHA'].min().strftime('%d/%m/%Y')
-                fecha_fin_str = fecha_larga(df['FECHA'].max()) if 'fecha_larga' in globals() else df['FECHA'].max().strftime('%d/%m/%Y')
+                fecha_inicio_str = fecha_larga(df['FECHA'].min())
+                fecha_fin_str = fecha_larga(df['FECHA'].max())
                 self.cell(0, 6, f"Período analizado: {fecha_inicio_str} a {fecha_fin_str}", 0, 1)
             except Exception:
-                 self.cell(0, 6, f"Período analizado: {df['FECHA'].min().strftime('%d/%m/%Y')} al {df['FECHA'].max().strftime('%d/%m/%Y')}", 0, 1)
+                self.cell(0, 6, f"Período analizado: {df['FECHA'].min().strftime('%d/%m/%Y')} al {df['FECHA'].max().strftime('%d/%m/%Y')}", 0, 1)
         else:
             self.cell(0, 6, "Período analizado: Sin datos", 0, 1)
 
@@ -340,7 +344,7 @@ class PDF(FPDF):
             self.multi_cell(0, 8, f"NOTAS:\n{notas.strip()}")
             self.set_text_color(0, 0, 0)
 
-def generar_pdf(df_servicios, ruta_pdf, notas=""):
+def generar_pdf(df_servicios, ruta_pdf, notas="", fecha_inicio_analisis=None, fecha_fin_analisis=None):
     """
     Genera un PDF con los datos de servicios procesados
     """
@@ -367,7 +371,7 @@ def generar_pdf(df_servicios, ruta_pdf, notas=""):
         pdf.add_page()
 
         # Agregar tabla de servicios
-        pdf.tabla_servicios(df_servicios, notas)
+        pdf.tabla_servicios(df_servicios, notas, fecha_inicio_analisis, fecha_fin_analisis)
 
         # Generar archivo
         pdf.output(ruta_pdf)
@@ -378,7 +382,7 @@ def generar_pdf(df_servicios, ruta_pdf, notas=""):
         return False, f"Error al generar el PDF: {str(e)}"
 
 
-def generar_pdf_modular(df, nombre_pdf, notas, log_callback=None):
+def generar_pdf_modular(df, nombre_pdf, notas, fecha_inicio_analisis=None, fecha_fin_analisis=None, log_callback=None):
     try:
         desktop = os.path.expanduser("~/OneDrive/Escritorio")
         carpeta_pdf = os.path.join(desktop, "pdf-relacion-servicios-en-efectivo")
@@ -387,7 +391,7 @@ def generar_pdf_modular(df, nombre_pdf, notas, log_callback=None):
             log_callback(f"📄 Intentando guardar PDF en: {ruta_pdf}", "info")
 
         # Llama a la función real que crea el PDF
-        exito, mensaje = generar_pdf(df, ruta_pdf, notas)
+        exito, mensaje = generar_pdf(df, ruta_pdf, notas, fecha_inicio_analisis, fecha_fin_analisis)
 
         if log_callback:
             if exito:
